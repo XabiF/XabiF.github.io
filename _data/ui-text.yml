@@ -3,10 +3,12 @@
 # English (default)
 # -----------------
 en: &DEFAULT_EN
+  name                       : "English"
   page                       : "Page"
   pagination_previous        : "Previous"
   pagination_next            : "Next"
   breadcrumb_home_label      : "Home"
+  lang_change                : "Change Language"
   breadcrumb_separator       : "/"
   toc_label                  : "On This Page"
   ext_link_label             : "Direct Link"
@@ -39,6 +41,11 @@ en: &DEFAULT_EN
   comment_success_msg        : "Thanks for your comment! It will show on the site once it has been approved."
   comment_error_msg          : "Sorry, there was an error with your submission. Please make sure all required fields have been completed and try again."
   loading_label              : "Loading..."
+  recommended_citation       : "Recommended citation"
+  download_paper             : "Download Paper"
+  read_more                  : "Read More"
+  published_in               : "Published in"
+  watch_talk                 : "Watch Talk"
 en-US:
   <<: *DEFAULT_EN
 en-CA:
@@ -51,12 +58,14 @@ en-AU:
 # Spanish
 # --------------
 es: &DEFAULT_ES
+  name                       : "Español"
   page                       : "Página"
   pagination_previous        : "Anterior"
   pagination_next            : "Siguiente"
   breadcrumb_home_label      : "Inicio"
   breadcrumb_separator       : "/"
   toc_label                  : "Contenidos"
+  lang_change                : "Cambiar idioma"
   ext_link_label             : "Enlace"
   less_than                  : "menos de"
   minute_read                : "minuto de lectura"
@@ -87,10 +96,17 @@ es: &DEFAULT_ES
   comment_success_msg        : "¡Gracias por tu comentario! Aparecerá en la página cuando sea aprobado." 
   comment_error_msg          : "Lo sentimos, ha habido un error con tu solicitud. Por favor, asegúrate de rellenar todos los campos obligatorios e inténtalo de nuevo."
   loading_label              : "Cargando..."
+  recommended_citation       : "Cita recomendada"
+  download_paper             : "Descargar artículo"
+  read_more                  : "Leer más"
+  published_in               : "Publicado en"
+  watch_talk                 : "Ver charla"
 es-ES:
   <<: *DEFAULT_ES
 es-CO:
   <<: *DEFAULT_ES
+
+############################################# Unused locales! ##########################################
 
 # French
 # -----------------

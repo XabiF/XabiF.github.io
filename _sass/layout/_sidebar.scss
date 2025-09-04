@@ -104,7 +104,7 @@
   }
 }
 
-.author__content {
+.author__content .page__lang {
   display: table-cell;
   vertical-align: top;
   padding-left: 15px;
@@ -148,7 +148,7 @@
   }
 }
 
-.author__bio {
+.author__bio .page__lang_opt {
   margin: 0;
 
   @include breakpoint($large) {
