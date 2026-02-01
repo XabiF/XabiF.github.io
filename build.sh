@@ -1,7 +1,7 @@
 #!/bin/bash
 
-mkdir -p files/cv
-cp -r cv/out/* files/cv/
+# Avoid recursive adding of docs inside docs etc, ensure we regenerate everything
+rm -rf docs
 
 bundle exec jekyll build
 

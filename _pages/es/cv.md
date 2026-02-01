@@ -8,4 +8,4 @@ redirect_from:
   - /resume
 ---
 
-Puedes encontrar mi CV en español [aquí](/files/cv/cv-es.pdf)!
+Puedes encontrar mi CV en español [aquí](/cv/out/cv-es.pdf)!

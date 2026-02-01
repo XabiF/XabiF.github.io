@@ -175,7 +175,7 @@ analytics:
 include:
   - .htaccess
   - _pages
-  - files
+  - cv/out
 keep_files:
   - .git
   - .svn
