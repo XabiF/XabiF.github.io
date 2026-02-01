@@ -1,0 +1,45 @@
+body {
+    font-size: 11pt;
+    line-height: 1.4;
+    color: #000;
+}
+
+nav, footer, .site-header, .download-btn {
+    display: none !important;
+}
+
+/*
+a::after {
+  content: " (" attr(href) ")";
+  font-size: 9pt;
+}
+*/
+
+h2 {
+    page-break-after: avoid;
+}
+.section {
+    page-break-inside: avoid;
+}
+
+@media print {
+    .author__content {
+        font-weight: bold;
+        font-size: 20pt;
+    }
+
+    .author__avatar {
+        width: 120px;
+        margin-bottom: 30px;
+    }
+
+    html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .print-tip, .author__pronouns, .page__title, .author__urls-wrapper, .page__lang, .page__lang_change, .page__footer, .btn {
+        display: none;
+        visibility: hidden;
+    }
+}
