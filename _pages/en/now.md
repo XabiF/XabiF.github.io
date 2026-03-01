@@ -1,6 +1,6 @@
 ---
 permalink: /now/
-title: "Now (February 2026)"
+title: "Now (March 2026)"
 lang: en
 author_profile: true
 ---
@@ -8,6 +8,8 @@ author_profile: true
 > Page inspired by [nownownow.com](https://nownownow.com/about)
 
 I'm currently working as a Quantum Data Sciencist doing R&D in Ayesa (I3B), implementing practical quantum (or quantum-inspired) solutions for industrial applications. I'm working from time to time in several somewhat-connected areas such as Tensor Networks, optimization techniques (quantum or TN-based) and Quantum Machine Learning. For instance, data compression is fundamental in all of them. I'm also learning about well-established DevOps and MLOps utilities such as Docker, Azure Blob Storage, MLflow or MinIO to setup proper infrastructure for project deployments.
+
+I've recently given an introductory class of a Quantum Tecnologies course in the University of Granada, along with my colleage Iñigo Perez Delgado, explaining how to create basic quantum circuits on [IBM Quantum Composer](https://quantum.cloud.ibm.com/composer). Such a wonderful experience to see a class full of motivated alumni and teachers!
 
 I'm playing around with tensors on my spare time occasionally, so I might show some cool, day-to-day application of tensor networks soon ;)
 
