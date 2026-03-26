@@ -176,6 +176,7 @@ include:
   - .htaccess
   - _pages
   - cv/out
+  - cv-europass
 keep_files:
   - .git
   - .svn

@@ -8,4 +8,4 @@ redirect_from:
   - /resume
 ---
 
-Puedes encontrar mi CV en español [aquí](/cv/out/cv-es.pdf)!
+Puedes encontrar mi CV en español [aquí](/cv/out/cv-es.pdf), o la versión EUROPASS [aquí](/cv-europass/cv-europass.pdf).
