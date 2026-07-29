@@ -2,7 +2,7 @@
 title: "Quantum Algorithms in Quantum Computers"
 collection: pubs
 category: theses
-permalink: /pub/2025-06-05-deg-thesis
+permalink: /pub/2024-06-05-deg-thesis
 excerpt: 'My Physics Degree thesis.'
 date: 2024-06-05
 lang: en

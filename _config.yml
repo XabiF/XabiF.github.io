@@ -42,7 +42,7 @@ author:
   googlescholar    : # "https://scholar.google.com/citations?user=PS_CX0AAAAAJ"
   inspire-hep      : # URL
   impactstory      : # URL
-  orcid            : # "http://orcid.org/yourorcidurl"
+  orcid            : https://orcid.org/0009-0006-1270-4007
   semantic         : # URL
   pubmed           : # "https://www.ncbi.nlm.nih.gov/pubmed/?term=john+snow"
   researchgate     : # URL
@@ -68,19 +68,19 @@ author:
   instagram        : # Username
   lastfm           : # Username
   linkedin         : "xabi-fernandez"
-  mastodon         : # URL
+  mastodon         : xabifdez
   medium           : # URL
   pinterest        : # Username
   soundcloud       : # Username
   steam            : # Username
   telegram         : # URL
   tumblr           : # Username
-  twitter          : "xabi_fndez"
+  twitter          : # "xabi_fndez"
   vine             : # Username
   weibo            : # Username
   wikipedia        : # Username
   xing             : # Username
-  youtube          : # "XabierFernández-p3w"
+  youtube          : # Username
   zhihu            : # Username
 
 # Publication Category - The following the list of publication categories and their headings
@@ -93,6 +93,10 @@ publication_category:
     titles:
       en: 'Theses'
       es: 'Tesis'
+  posts:
+    titles:
+      en: 'Posts'
+      es: 'Posts'
   manuscripts:
     titles:
       en: 'Articles'
