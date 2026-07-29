@@ -1,0 +1,622 @@
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+
+<meta charset="utf-8">
+
+
+
+<!-- begin SEO -->
+
+
+
+
+
+
+
+
+
+<title>Designing a fast PDF text searching algorithm - Xabier Fernández</title>
+
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2026-07-28T00:00:00+00:00">
+
+
+
+  <link rel="canonical" href="https://xabif.github.io/pub/2026-07-28-doc-search">
+
+
+
+
+
+  
+
+  
+
+
+
+
+
+
+  <script type="application/ld+json">
+    {
+      "@context" : "http://schema.org",
+      "@type" : "Person",
+      "name" : "Xabier Fernández",
+      "url" : "https://xabif.github.io",
+      "sameAs" : null
+    }
+  </script>
+
+
+
+
+
+
+<!-- end SEO -->
+
+<!-- Open Graph protocol data (https://ogp.me/), used by social media -->
+<meta property="og:locale" content="en">
+<meta property="og:site_name" content="Xabier Fernández"> 
+<meta property="og:title" content="Designing a fast PDF text searching algorithm">
+
+  <meta property="og:type" content="article">
+
+
+  <meta property="og:description" name="description" content="A few weeks ago I wondered if I could make a custom, fast PDF text searching algorithm from scratch, using only my existing knowledge. This is the result.">
+
+
+  <meta property="og:url" content="https://xabif.github.io/pub/2026-07-28-doc-search">
+
+
+
+
+
+<!-- end Open Graph protocol -->
+
+<link href="https://xabif.github.io/feed.xml" type="application/atom+xml" rel="alternate" title="Xabier Fernández Feed">
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="https://xabif.github.io/assets/css/main.css">
+
+<meta http-equiv="cleartype" content="on">
+    
+
+<!-- start custom head snippets -->
+
+<!-- Support for Academicons -->
+<link rel="stylesheet" href="https://xabif.github.io/assets/css/academicons.css"/>
+
+<!-- favicon from https://commons.wikimedia.org/wiki/File:OOjs_UI_icon_academic-progressive.svg -->
+<link rel="apple-touch-icon" sizes="180x180" href="https://xabif.github.io/images/favicon/apple-touch-icon.png"/>
+<!-- <link rel="icon" type="image/svg+xml" href="https://xabif.github.io/images/favicon/favicon.svg"/> -->
+<link rel="icon" type="image/png" href="https://xabif.github.io/images/favicon/favicon-32x32.png" sizes="32x32"/>
+<link rel="icon" type="image/png" href="https://xabif.github.io/images/favicon/favicon-16x16.png" sizes="16x16"/>
+<link rel="manifest" href="https://xabif.github.io/images/favicon/site.webmanifest"/>
+<link rel="icon" href="/images/favicon/favicon.ico"/>
+<meta name="theme-color" content="#ffffff"/>
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        <button><div class="navicon"></div></button>
+        <ul class="visible-links">
+          <li class="masthead__menu-item masthead__menu-item--lg persist"><a href="https://xabif.github.io/">Xabier Fernández</a></li>
+          
+            
+            <li class="masthead__menu-item"><a href="https://xabif.github.io/now/">Now</a></li>
+          
+            
+            <li class="masthead__menu-item"><a href="https://xabif.github.io/cv/">CV</a></li>
+          
+            
+            <li class="masthead__menu-item"><a href="https://xabif.github.io/talks/">Talks</a></li>
+          
+            
+            <li class="masthead__menu-item"><a href="https://xabif.github.io/pubs/">Publications</a></li>
+          
+            
+            <li class="masthead__menu-item"><a href="https://xabif.github.io/other/">Other Projects</a></li>
+          
+          <li id="theme-toggle" class="masthead__menu-item persist tail">
+            <a role="button" aria-labelledby="theme-icon"><i id="theme-icon" class="fa-solid fa-sun" aria-hidden="true" title="toggle theme"></i></a>
+          </li>
+        </ul>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+    
+
+
+
+
+
+<div id="main" role="main">
+  
+
+
+  <div class="sidebar sticky">
+  
+
+
+
+<div itemscope itemtype="http://schema.org/Person">
+
+  <div class="author__avatar">
+    
+    	<img src="https://xabif.github.io/images/profile.jpg" class="author__avatar" alt="Xabier Fernández Sánchez"  fetchpriority="high" />
+    
+  </div>
+
+  <div class="author__content">
+    <h3 class="author__name">Xabier Fernández Sánchez</h3>
+    <p class="author__pronouns">he/him</p>
+    <p class="author__bio">Quantum Computing enthusiast, among other cool things</p>
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      <!-- Font Awesome icons / Biographic information  -->
+      
+        <li class="author__desktop"><i class="fas fa-fw fa-location-dot icon-pad-right" aria-hidden="true"></i>Derio</li>
+      
+      
+        <li class="author__desktop"><i class="fas fa-fw fa-building-columns icon-pad-right" aria-hidden="true"></i>Ayesa, Ibermática (I3B)</li>
+      
+      
+      
+        <li><a href="mailto:xabifdez@proton.me"><i class="fas fa-fw fa-envelope icon-pad-right" aria-hidden="true"></i>Email</a></li>
+      
+
+      <!-- Font Awesome and Academicons icons / Academic websites -->
+      
+            
+      
+      
+      
+      
+        <li><a href="https://orcid.org/0009-0006-1270-4007"><i class="ai ai-orcid ai-fw icon-pad-right"></i>ORCID</a></li>
+      
+                              
+      
+      
+      
+
+      <!-- Font Awesome icons / Repositories and software development -->
+      
+            
+            
+      
+        <li><a href="https://github.com/XabiF"><i class="fab fa-fw fa-github icon-pad-right" aria-hidden="true"></i>GitHub</a></li>
+      
+            
+            
+
+      <!-- Font Awesome icons / Social media -->
+              
+      
+      
+            
+      
+                  
+                  
+      
+            
+            
+      
+        <li><a href="https://www.linkedin.com/in/xabi-fernandez"><i class="fab fa-fw fa-linkedin icon-pad-right" aria-hidden="true"></i>LinkedIn</a></li>
+            
+      
+        <li><a href="https://mastodon.social/@xabifdez"><i class="fab fa-fw fa-mastodon icon-pad-right" aria-hidden="true"></i>Mastodon</a></li>
+      
+            
+                  
+            
+      
+            
+            
+      
+              
+      
+                      
+      
+      
+            
+    </ul>
+  </div>
+
+  <div class="page__lang">
+    <h3 class="page__lang_change">Change Language</h3>
+    
+      
+    
+      
+        
+          <a class="" href="https://xabif.github.io/es">Español</a>
+        
+      
+    
+  </div>
+</div>
+
+  
+  </div>
+
+
+  <article class="page" itemscope itemtype="http://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Designing a fast PDF text searching algorithm">
+    <meta itemprop="description" content="A few weeks ago I wondered if I could make a custom, fast PDF text searching algorithm from scratch, using only my existing knowledge. This is the result.">
+    <meta itemprop="datePublished" content="July 28, 2026">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 class="page__title" itemprop="headline">Designing a fast PDF text searching algorithm
+</h1>
+          
+        
+        
+        
+          <p class="page__date"><strong><i class="fa fa-fw fa-calendar" aria-hidden="true"></i> Published:</strong> <time datetime="2026-07-28T00:00:00+00:00">July 28, 2026</time></p>
+            
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        <p>A few weeks ago I wondered if I could make a custom, fast PDF text searching algorithm from scratch, using only my existing knowledge. <a href="https://github.com/XabiF/fast-doc-search-poc" target="_blank">This</a> is the result.</p>
+
+<ul>
+  <li><a href="#design">Design</a></li>
+  <li><a href="#scribble-search-with-lookup-tables">“Scribble-search” with lookup tables</a></li>
+  <li><a href="#the-art-of-indexing">The art of indexing</a>
+    <ul>
+      <li><a href="#text-massaging">Text massaging</a></li>
+      <li><a href="#its-just-a-map">It’s just a map</a></li>
+      <li><a href="#overall-procedure">Overall procedure</a></li>
+    </ul>
+  </li>
+  <li><a href="#crafting-binary-files">Crafting binary files</a>
+    <ul>
+      <li><a href="#keeping-everything-fixed">Keeping everything fixed</a></li>
+      <li><a href="#jumping-element-by-element">Jumping element by element</a></li>
+      <li><a href="#the-kernel-deals-with-it">The kernel deals with it</a></li>
+    </ul>
+  </li>
+  <li><a href="#bringing-the-poc-to-life">Bringing the PoC to life</a>
+    <ul>
+      <li><a href="#optimizations-and-terminal-graphics">Optimizations and terminal graphics</a></li>
+      <li><a href="#blink-and-you-miss-it">Blink and you miss it</a></li>
+      <li><a href="#the-pdf-bottleneck">The PDF bottleneck</a></li>
+    </ul>
+  </li>
+  <li><a href="#concluding-remarks">Concluding remarks</a></li>
+</ul>
+
+<h2 id="design">Design</h2>
+
+<p>In order to keep a clear goal, I designed and coded this Proof-of-Concept (PoC) under the following design choices:</p>
+
+<ul>
+  <li>Search logic must be as fast as possible</li>
+  <li>The preprocessing/indexing step may be made slower, as it will not be executed very frequently (only if new PDFs were to be added to the collection)</li>
+  <li>Temporary memory/storage is not a burden as long as it doesn’t go beyond “acceptable” sizes (for instance, dozens of GB of preprocessed data for just a few PDF documents might be too much!)</li>
+  <li>The PDF text may be massaged into simpler yet still human-readable text, since many elements of written text are irrelevant for content-searching purposes (like dots, commas, tildes, letter casing and so on)</li>
+  <li>The PoC performance will be tested with my personal PDF library, which contains about ~700 books and scientific papers, roughly ~4GB of data in PDF format</li>
+  <li>The PoC design must be as simple as possible, given the already stated principles (in other words, no LLM/RAG aid or overly complicated code logic)</li>
+</ul>
+
+<p>The first two design goals go nicely together, since</p>
+
+<p>In other words, it’s convenient to move as much processing as possible to the preprocessing step (as a consequence, the searching step will be lighter), while avoiding an excessive amount of preprocessed data: a time vs. memory trade-off.</p>
+
+<h2 id="scribble-search-with-lookup-tables">“Scribble-search” with lookup tables</h2>
+
+<p>I’m in the process of reverse-engineering the Nintendo DS game <a href="https://github.com/XorTroll/super-scribblenauts-re" target="_blank"><strong>Super Scribblenauts</strong></a>. For those unaware of the Scribblenauts saga, the common gist of the games is that you have a magical notebook which you can use to create nearly any object/live being you can imagine. <em>Super Scribblenauts</em> (the second game in the saga) and later saga entries also support adjectives as modifiers! This opens the door for infinitely many creative ideas for beating game levels. Just take a look at the game release trailer:</p>
+
+<div style="position: relative; width: 100%; padding-bottom: 56.25%">
+<iframe src="https://youtube.com/embed/_udPpJgYiVA" frameborder="0" allowfullscreen="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" style="position: absolute; width: 100%; height: 100%;">
+</iframe>
+</div>
+
+<p>It is a rather slow-paced project, but I’ve already uncovered interesting aspects about how objects and adjectives are utilized in the game. The game uses several lookup tables to quickly find objects when the player types an object/adjective name. There are roughly ~5000 unique objects (not counting synonyms pointing to the same underlying object), so they had to come up with a somewhat fast search technique to make the search time feel as unnoticeable as possible to the player.</p>
+
+<p>For this purpose, the game has several dedicated object and adjective lookup tables to be searched in order to find the object/adjective data. The interesting part about them is that they begin with a two-character 32-bit integer matrix/2D array, whose entries contain the location of word entries beginning with a given pair of characters.</p>
+
+<p>Say you want to find the lookup table entry for the object “TOILET” (the game uses uppercase letters). Instead of having to traverse the lookup table entries one by one until you find the entry named “TOILET” (a naive and probably costly searching procedure), you just go to the matrix entry corresponding to the characters “TO”, read the stored 32-bit value there (which consists of the position/offset of the lookup table file where all the words starting with “TO” are located) and begin your search there. By utilizing some extra initial space to store redundant information as an offset matrix, the search can be made significantly faster.</p>
+
+<p>Inspired by this approach, I decided to go a step further (since our target data is orders of magnitude larger than the object/adjective data in <em>Super Scribblenauts</em>) and considered to make use of a three-character matrix (well, I guess you could call it a tensor) when storing the preprocessed data generated by this PoC.</p>
+
+<h2 id="the-art-of-indexing">The art of indexing</h2>
+
+<p>The idea of preprocessing the words in the input text, also known as indexing, was on my mind from the very start of this experiment. Without any kind of preprocessing steps, the experiment would essentially boil down to reading the documents character by character and keep track of any matches… and we can certainly do better than that!</p>
+
+<h3 id="text-massaging">Text massaging</h3>
+
+<p>Let’s remove as many irrelevant elements from the text as possible. First of all, letter casing makes no difference, so all text can be transformed into lower-case characters. In fact, I found it easier to define a whitelist of allowed characters and filter everything else found when scanning the document text character by character. The allowed characters are lower-case <code class="language-plaintext highlighter-rouge">a</code>/<code class="language-plaintext highlighter-rouge">z</code>, numbers <code class="language-plaintext highlighter-rouge">0</code>/<code class="language-plaintext highlighter-rouge">9</code>, as well as special characters <code class="language-plaintext highlighter-rouge">-</code>, <code class="language-plaintext highlighter-rouge">:</code>, <code class="language-plaintext highlighter-rouge">.</code>, <code class="language-plaintext highlighter-rouge">/</code>, <code class="language-plaintext highlighter-rouge">\</code> and <code class="language-plaintext highlighter-rouge">*</code>.</p>
+
+<p>All these special characters (except for <code class="language-plaintext highlighter-rouge">*</code>) are only allowed if they are found in the middle of words (they are only filtered if the previous/next character is also a space or another special character). This, among other things, prevents URLs from being awkwardly split (<code class="language-plaintext highlighter-rouge">https://archive.org</code> would be otherwise recognized as three separate words <code class="language-plaintext highlighter-rouge">https</code>, <code class="language-plaintext highlighter-rouge">archive</code> and <code class="language-plaintext highlighter-rouge">org</code>) while still skipping unnecessary punctuation marks, like commas or dots after words.</p>
+
+<p>The character <code class="language-plaintext highlighter-rouge">*</code> is a doubly-special <em>pseudo-character</em> indicating a null/empty character, due to the lookup-table mechanism implicitly requiring at least three characters in a valid word. For example, the word <code class="language-plaintext highlighter-rouge">a</code> is stored as <code class="language-plaintext highlighter-rouge">a**</code> in the lookup table, while the extra characters are intentionally ignored when showing any found results. This trick was essentially introduced in order to avoid not-that-human-readable sentences when displaying the preprocessed text (otherwise, for example, the sentence “a horn of plenty” would just be “horn plenty” since the words <code class="language-plaintext highlighter-rouge">a</code> and <code class="language-plaintext highlighter-rouge">of</code> would’ve been ignored). Human-readability of the resulting search results is a design choice, after all.</p>
+
+<h3 id="its-just-a-map">It’s just a map</h3>
+
+<p>Formally speaking, indexing is a matter of splitting text into unique chunks of letters and mapping each unique chunk to some unique numerical value. Modern text indexings used in language models are far beyond the scope of this work, and again, I wanted to keep this as a simple experiment.</p>
+
+<p>As a naive indexing concept, I decided to simply map each unique preprocessed word to an incrementing index value: the first identified word is assigned index 0, the next one gets assigned index 1, and so on. Running preliminary tests with a few dozens of PDFs I noticed that the total amount of words I was finding was around ~30000, so I assumed that a 32-bit index would be more than enough even if the document database were to be several times larger. This way, arbitrary-sized words are mapped into a 4-byte, 32-bit index.</p>
+
+<blockquote>
+  <p>In fact, the choice of integer sizes is key to optimize the design. Every used bit of space must have a purpose if we want to craft a well-suited design! For instance, if we were to have an integer which will always be bounded between 0 and 100, there is no point on using more than a byte to store it, since a byte already provides us with 256 unique values. These little space optimizations become specially relevant if problem is scaled: if we naively chose to use a 32-bit integer (4 bytes), we would be using three times more space!</p>
+</blockquote>
+
+<h3 id="overall-procedure">Overall procedure</h3>
+
+<p>Putting everything together, we have an indexing procedure to apply for every PDF document in our library. Each PDF is read word by word, and each unique word is mapped into a unique index.</p>
+
+<p>Through this procedure, we end up with two relevant data objects: the indexed PDF contents for each document, which are now a chain of 32-bit integers (word after word) per document, and the dictionary/map that converts between words and indices. How shall we keep this data stored?</p>
+
+<h2 id="crafting-binary-files">Crafting binary files</h2>
+
+<p>Preprocessed data must be saved somewhere, so that it may be accessed as swiftly as possible when a search is performed. Luckily, I have some (humble) experience playing around with compact and fast-to-navigate binary files, since I’ve come across various types of file formats when reverse-engineering and playing around with various Nintendo systems and games.</p>
+
+<p>The concept of a binary file is rather simple: they are nothing more than a sequence of bytes along with a scheme to interpret those bytes as data. Given four bytes, you may read them as four unsigned integers between 0 and 255, as four signed integers between -128 and 127, as two unsigned integers between 0 and 65535, and all the other possible combinations of data types. Designing a binary format is choosing what information is being encoded in which bytes, and thus, what representation to use when reading or writing them. We also have to consider the placement of the data, since different schemes can lead to very fast or very slow reading times, as I will explain in next sections.</p>
+
+<p>For this reason, I followed two design choices for the preprocessed data files: the combination of fixed-size sections and jump offsets, and linked-list-inspired data insertion (although this last one was not really advantageous in the final prototype). The design of these binary files is explicitly explained in <a href="https://github.com/XabiF/fast-doc-search-poc" target="_blank">this PoC repository</a> and in the code itself, but I’d like to share some intuition behind them.</p>
+
+<h3 id="keeping-everything-fixed">Keeping everything fixed</h3>
+
+<p>Imagine we want to store a list of words in a binary file. We have to somehow deal with the fact that different words will likely have different lengths, so how can we do it?</p>
+
+<p>One solution is to store each word one after another, but putting a final byte indicating that the word has ended. In fact, this is how strings are internally encoded in memory in languages like C or C++, and how <code class="language-plaintext highlighter-rouge">strlen</code>, <code class="language-plaintext highlighter-rouge">printf</code> and many other functions can tell when a given string ends (otherwise they would keep endlessly reading byte after byte in memory and interpreting them all as characters). This (marginally) increases the data size by storing an extra byte for each word, but it allows us to identify where each word ends and the next one starts.</p>
+
+<p>Equivalently, we could store the string length as a fixed integer (say 32-bit) prior to the word itself, so by reading the length first we already know beforehand how many characters we will need to read next. These two schemes are conceptually quite similar, yet they involve different trade-offs when you look at them closely. Knowing the full length allows you to read the entire string in bulk instead of byte-by-byte or arbitrary-sized-bulk reads, but at the same time it requires more than a single byte of extra space: another trade-off to take into account.</p>
+
+<p>Consider now that we intend to frequently jump to specific words. In order to jump to the <code class="language-plaintext highlighter-rouge">n</code>-th word in the list, we cannot reliably predict the offset where the word will be located, as it depends on the different lengths of all previous words… unless we read the binary file word by word, keeping track of how many words have we come across, until we get there. This, as you may guess, can be prohibitely slow for long word lists.</p>
+
+<p>An alternative option is to use fixed-size byte blocks for each word. If, for instance, we know beforehand that no word will ever have more than 50 characters (these kinds of bounds are usually reasonable to estimate in specific use-cases) we can store each word using a chunk of 50 bytes, filling the remaining empty bytes with some unique byte value that corresponds to no valid character (typically the extremes <code class="language-plaintext highlighter-rouge">0</code> or <code class="language-plaintext highlighter-rouge">255</code> are used). This scheme will likely waste more space than other simpler ones, but it allows us to very quickly navigate to the <code class="language-plaintext highlighter-rouge">n</code>-th word, since we know it is always located at the <code class="language-plaintext highlighter-rouge">50*n</code>-th byte. For this very reason, fixed-size sections are very common in binary file design.</p>
+
+<p>Well, which one is the best option then? Long story short, this is yet another trade-off to consider. Depending on the use-case goals, one layout or another ought to be chosen. If you don’t intend to perform these kinds of lookups, and care more about keeping the binary file as small as it can be, then the first option is more appropriate.</p>
+
+<p>For this PoC, I relied on the first option to store words in the word-to-index mapping file. Since the three-character offset matrix already simplifies the procedure of searching through the map, this scheme is more than enough. In places like lists of indexed words, considering that word indices are always 4 bytes long, I can directly make use of the quick navigation that the second option described here enables. Again, the precise binary file layouts are explained in <a href="https://github.com/XabiF/fast-doc-search-poc" target="_blank">this PoC repository</a> if you wish to dive deeper.</p>
+
+<h3 id="jumping-element-by-element">Jumping element by element</h3>
+
+<p>A linked list is a simple data structure concept widely used in programming. Simply put, it’s a list where each list element points to the next one by storing information somewhere in the element itself.</p>
+
+<p>For example, let’s consider a linked list of variable-length strings. Using C-like pseudocode, this is an example structure design for a list element:</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="nc">StringListElement</span> <span class="p">{</span>
+    <span class="n">u32</span> <span class="n">next_element_relative_position</span><span class="p">;</span> <span class="c1">// Or 0 if there is no next element (end of the list)</span>
+    <span class="n">u32</span> <span class="n">string_length</span><span class="p">;</span>
+    <span class="kt">char</span> <span class="n">string</span><span class="p">[</span><span class="n">string_length</span><span class="p">];</span> <span class="c1">// (a char is the same size as a byte)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>On each element, the first 32-bit integer points to where the next element starts. If you imagine the entire linked list as a contiguous list of elements in memory, one after each other, this means that <code class="language-plaintext highlighter-rouge">next_element_relative_position</code> bytes after the start of the current element is where the next element begins. This means that, without having to read any other contents of a list element, we can quickly jump element after element by just reading these relative offsets until reaching whatever element we are looking for. For instance, if we wish to find the end of the list, we just have to jump from the start of the list, element by element, until we find the element with no next element information in it.</p>
+
+<p>This is a notoriously simple example (in fact, just with the string and its length you could already easily find out where the next element is, as hinted in the previous section), but for more complicated data to be stored on the list, this system provides a really easy way to quickly navigate a list.</p>
+
+<h3 id="the-kernel-deals-with-it">The kernel deals with it</h3>
+
+<p>This project was the first time I’ve relied on the Linux kernel to perform any file I/O.</p>
+
+<p>The kernel provides two utilities (<code class="language-plaintext highlighter-rouge">mmap</code> and <code class="language-plaintext highlighter-rouge">munmap</code>) to map/unmap memory. Instead of having to manually call <code class="language-plaintext highlighter-rouge">read</code>/<code class="language-plaintext highlighter-rouge">write</code>/<code class="language-plaintext highlighter-rouge">seek</code> functions to move and operate through the file, the kernel takes care of those operations internally, and it simply provides me with a pointer to the file data as if it were any other memory in the program. This is not only cleaner but also faster due to all memory reading and mapping being done at the kernel level directly.</p>
+
+<p>While I did not make any proper performance comparisons back when testing early design ideas on the PoC, I recall noticing some qualitative speedup after switching from regular file I/O to <code class="language-plaintext highlighter-rouge">mmap</code> magic. Since I switched I/O strategies back when I was testing over a smaller PDF database, I can only hypothesize that the performance gain will be even higher when working over my entire PDF library.</p>
+
+<h2 id="bringing-the-poc-to-life">Bringing the PoC to life</h2>
+
+<h3 id="optimizations-and-terminal-graphics">Optimizations and terminal graphics</h3>
+
+<p>While I coded the very early testing in Python, since the very start I wanted to settle on C++ for a nicely working PoC, mainly due to speed and performance concerns. After all, no Python code will ever beat, maybe not even come close to an equivalent C++ code compiled with <code class="language-plaintext highlighter-rouge">-O3</code> optimization and other cleverly chosen compiler flags.</p>
+
+<p>I also wanted to make a <strong>dynamic</strong> search tool from the beginning: some nice UI where the search result refreshes every time your search query changes (that is, every time you type or delete a character). I was really hoping that search times would be fast enough to make it seem instantaneous. Since making a GUI (graphical UI) can be quite time-consuming, I decided to introduce myself to <a href="https://invisible-island.net/ncurses/" target="_blank">ncurses</a> for the first time to (learn to) make a simple TUI (terminal UI) interface.</p>
+
+<h3 id="blink-and-you-miss-it">Blink and you miss it</h3>
+
+<p>So, having this amount of care put into optimizing the PoC design, how well does the final prototype perform?</p>
+
+<p>As a reminder, I intend to study the performance of this PoC on my personal PDF library, which consists of roughly ~700 PDFs of a combined ~4GB size.</p>
+
+<p>The indexing routine takes roughly ~4-5min to complete, and produces ~600k words. The resulting files are a ~10MB word table file and a ~100MB document table file.</p>
+
+<div style="text-align: center;">
+<img src="/images/pubs/doc-search/docsearch-index.png" alt="drawing" width="90%" />
+</div>
+
+<p>Well, what about the word search? See it for yourself:</p>
+
+<div style="text-align: center;">
+<video width="90%" autoplay="" loop="" muted="" controls="">
+  <source src="/images/pubs/doc-search/docsearch.mp4" type="video/mp4" />
+</video>
+</div>
+
+<blockquote>
+  <p>Minor note: I’m using a slightly reduced version of my personal library on this video, more like ~3GB in size, but the search times are pretty much the same than with the full library.</p>
+</blockquote>
+
+<p>Searching is indeed instantaneous for most search queries, although this clearly depends on the word frequency in the database. Ultra-frequent words such as <code class="language-plaintext highlighter-rouge">a</code>, <code class="language-plaintext highlighter-rouge">of</code>, <code class="language-plaintext highlighter-rouge">and</code> or <code class="language-plaintext highlighter-rouge">the</code> take noticeable times close to a second, which is nonetheless impressive considering the millions of found ocurrences in the entire database. Needless to say, the code could be easily adapted to only search and return the first <code class="language-plaintext highlighter-rouge">N</code> occurrences, in which case this would no longer be a problem.</p>
+
+<p>I find particularly impressive that, as a result of the chosen indexing design, the algorithm is stupid fast at finding out if a word is not present in any of the indexed PDFs in the entire database, taking merely tens of microseconds (wow) thanks to the fast lookup in the word table file design.</p>
+
+<p>I was quite tempted to make a brief study on the relationship between word frecuency and search time, and I was somewhat surprised to find it nicely follows a linear trend:</p>
+
+<div style="text-align: center;">
+<img src="/images/pubs/doc-search/linear-regression.png" alt="drawing" width="80%" />
+</div>
+
+<p><code class="language-plaintext highlighter-rouge">y = 6.077165447367483e-07 x + 0.010739720187252819 (R^2 = 0.99662)</code></p>
+
+<p>Additionally, note that the searching routine takes some time looking up words nearby each occurrence in order to print the search results in a user-friendly way. It is worth mentioning that search times notoriously improve if this lookup is removed, to the point where the search time for <code class="language-plaintext highlighter-rouge">the</code> (one of the worst ones) drops from ~0.75s to ~0.03s. These sorts of minor tweaks on the algorithm code might have huge effects on performance if it were adapted to a particular use-case!</p>
+
+<h3 id="the-pdf-bottleneck">The PDF bottleneck</h3>
+
+<p>All testing so far was done over PDF files, yet PDF text extraction is a highly nontrivial procedure. In fact, it took me quite some time to find a good C++ library for this purpose (until I found <a href="https://poppler.freedesktop.org/" target="_blank">poppler</a>). PDF files are a rather complicated format, with text placed in different parts of a page (and with tons of subtleties I don’t even know of). After all, how do you map, for example, a multi-column academic paper PDF into a regular text file, which is nothing more than a chain of words with no explicit notion of a layout or positioning?</p>
+
+<p>If this work were applied to regular text files, like code or Markdown files, the indexing step would be drastically faster. In fact, if I preprocess PDF files as text files externally, and then run the indexing over the ~160MB of plaintext files, it takes a mere 16s to preprocess compared to the ~5min of PDF file indexing.</p>
+
+<h2 id="concluding-remarks">Concluding remarks</h2>
+
+<p>Could this algorithm be improved? Undoubtedly so.</p>
+
+<p>After all, the followed design choices made this PoC rather poorly suited for many use-cases where LLMs strive. The indexing I employed is useless at reflecting similarities in words (not in letter proximity nor in semantical closeness) while well-known NLP word embeddings, paying the cost of using hundred- or thousand-dimensional vectors for each token instead of a mere 32-bit integer, are ideal for those purposes. In fact, this indexing generates a lot of garbage words (some examples: <code class="language-plaintext highlighter-rouge">an/aps-135</code>, <code class="language-plaintext highlighter-rouge">uniform0.2</code>, <code class="language-plaintext highlighter-rouge">111303022013102321</code>, <code class="language-plaintext highlighter-rouge">li:..tan</code>, <code class="language-plaintext highlighter-rouge">x3b3</code>) which are not meaningful in any way. I’m pretty sure a more careful preprocessing and string filtering code could likely reduce the total word count and further improve search times.</p>
+
+<p>As a fun sidenote, I did make a small prototype where I tried to preprocess and store every single word appearance as part of the indexing procedure. After all, having all ocurrences already pre-computed as a colossal dictionary sounded like an interesing approach: it reduces the entire searching problem to a fast custom-dictionary lookup problem. However, the resulting file was growing so damn quickly as the indexing code was running (getting fast into dozens-of-GB territory) that I inmediately abandoned the idea. Caching is a powerful technique (the kernel of device you’re reading this on is relying on its own memory caching shenanigans right now), but abusing it puts too much burden on space/memory requirements. Remember the idea of time vs. space trade-offs? Both extremes turn out to be quite inefficient for their own reasons!</p>
+
+<p>This really was a fun project to explore and play around with. After all, it is by spending time in these random experiments that you get to learn the subtleties of many complex topics (text preprocessing, space/time optimization, binary file design, fast lookup, I/O, and so on). I might get back to this experiment and try to implement some of these potential improvements in the future, who knows…</p>
+
+<blockquote>
+  <p>No LLM aid was used to write this post, nor to design or code this PoC ;)</p>
+</blockquote>
+
+
+        
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+
+
+      </footer>
+
+      
+
+<section class="page__share">
+  
+    <h4 class="page__share-title">Share on</h4>
+  
+
+  <a href="https://mastodon.social/share?text=https://xabif.github.io/pub/2026-07-28-doc-search" target="_blank" class="btn btn--mastodon" title="Share on Mastodon"><i class="fab fa-mastodon" aria-hidden="true"></i><span> Mastodon</span></a>
+
+  <a href="https://www.reddit.com/submit?url=https://xabif.github.io/pub/2026-07-28-doc-search" target="_blank" class="btn btn--reddit" title="Share on Reddit"><i class="fab fa-reddit" aria-hidden="true"></i><span> Reddit</span></a>
+
+  <a href="https://bsky.app/intent/compose?text=https://xabif.github.io/pub/2026-07-28-doc-search" target="_blank" class="btn btn--bluesky" title="Share on Bluesky"><i class="fab fa-bluesky" aria-hidden="true"></i><span> Bluesky</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://xabif.github.io/pub/2026-07-28-doc-search" target="_blank" class="btn btn--linkedin" title="Share on LinkedIn"><i class="fab fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+
+
+  <nav class="pagination">
+    
+      <a href="https://xabif.github.io/pub/2024-06-05-deg-thesis" class="pagination--pager" title="Quantum Algorithms in Quantum Computers
+">Previous</a>
+    
+    
+      <a href="#" class="pagination--pager disabled">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+</div>
+
+
+    <div class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- <a href="/sitemap/">Sitemap</a> -->
+
+<!-- Support for MatJax -->
+<script defer src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script"></script>
+
+<!-- Support for Plotly -->
+<script defer src='https://cdnjs.cloudflare.com/ajax/libs/plotly.js/3.0.1/plotly.min.js'></script>
+
+<!-- Support for Mermaid -->
+<script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({startOnLoad:true, theme:'default'});
+    await mermaid.run({querySelector:'code.language-mermaid'});
+</script>
+
+<!-- end custom footer snippets -->
+
+        
+
+
+<div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>Follow:</strong></li>
+    
+    
+      <li><a href="http://github.com/XabiF"><i class="fab fa-github" aria-hidden="true"></i> GitHub</a></li>
+    
+    
+    
+    <li><a href="https://xabif.github.io/feed.xml"><i class="fa fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+    
+  </ul>
+</div>
+
+
+<div class="page__footer-copyright">
+  &copy; 2026 Xabier Fernández, Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://github.com/academicpages/academicpages.github.io">AcademicPages</a>, a fork of <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.<br />
+  Site last updated 2026-07-29
+</div>
+
+      </footer>
+    </div>
+
+    <script type="module" src="https://xabif.github.io/assets/js/main.min.js"></script>
+
+
+
+
+
+
+
+
+  </body>
+</html>
+
