@@ -178,6 +178,34 @@ Feel free to stop and think about this formulation until you see how and why it 
 
 There are many libraries and software tools for implementing and solving optimization problems, but I settled on [PuLP](https://pypi.org/project/PuLP/){:target="_blank"}, a Python library equipped with multiple solvers for multiple problem types. I created [a simple module](https://github.com/XabiF/rosca-optimization/blob/main/rosca.py){:target="_blank"} for the generic resolution of arbitrary 'ROSCA' configurations using the formulation above. The solver routine takes all the inputs mentioned above ($$N$$, $$T$$, $$B_{init}$$ and so on) and outputs the optimal choice for variables $$\Delta p_{it}$$ and $$a_{it}$$, which can be post-processed to extract the actual dynamics of the solved 'ROSCA'.
 
+Here's an example small 'ROSCA' ($$N = 3$$) dynamics obtained from a solver's output:
+
+```
+ROSCA SIMULATION
+ TIME-STEP t=0:
+  Bank currently has 0€
+   * Person 0 (currently has 0€) earns 1000€ and takes 2000€ from the bank (now has 3000€)
+      Goal of 3000€ reached! Purchased, now has 0€
+   - Person 1 (currently has 0€) earns 1000€ and deposits 1000€ in the bank (now has 0€)
+   - Person 2 (currently has 0€) earns 1000€ and deposits 1000€ in the bank (now has 0€)
+  Bank is left with 0€
+ TIME-STEP t=1:
+  Bank currently has 0€
+   * Person 0 (currently has 0€) earns 1000€ and deposits 1000€ in the bank (now has 0€)
+   * Person 1 (currently has 0€) earns 1000€ and takes 2000€ from the bank (now has 3000€)
+      Goal of 3000€ reached! Purchased, now has 0€
+   - Person 2 (currently has 0€) earns 1000€ and deposits 1000€ in the bank (now has 0€)
+  Bank is left with 0€
+ TIME-STEP t=2:
+  Bank currently has 0€
+   * Person 0 (currently has 0€) earns 1000€ and deposits 1000€ in the bank (now has 0€)
+   * Person 1 (currently has 0€) earns 1000€ and deposits 1000€ in the bank (now has 0€)
+   * Person 2 (currently has 0€) earns 1000€ and takes 2000€ from the bank (now has 3000€)
+      Goal of 3000€ reached! Purchased, now has 0€
+  Bank is left with 0€
+Goal reach wait times: [1, 2, 3], total wait time = 6
+```
+
 What 'ROSCA' configurations shall we study? I settled on three different scenarios:
 
 - The 'uniform' scenario: all people begin with an empty balance, the common fund also begins empty, all $$N$$ people earn 1000€ per time-step (I essentially think of them as months throughout the entire implementation) and have a goal of 10000€.

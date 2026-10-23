@@ -502,6 +502,33 @@
 
 <p>There are many libraries and software tools for implementing and solving optimization problems, but I settled on <a href="https://pypi.org/project/PuLP/" target="_blank">PuLP</a>, a Python library equipped with multiple solvers for multiple problem types. I created <a href="https://github.com/XabiF/rosca-optimization/blob/main/rosca.py" target="_blank">a simple module</a> for the generic resolution of arbitrary ‘ROSCA’ configurations using the formulation above. The solver routine takes all the inputs mentioned above (\(N\), \(T\), \(B_{init}\) and so on) and outputs the optimal choice for variables \(\Delta p_{it}\) and \(a_{it}\), which can be post-processed to extract the actual dynamics of the solved ‘ROSCA’.</p>
 
+<p>Here’s an example small ‘ROSCA’ (\(N = 3\)) dynamics obtained from a solver’s output:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ROSCA SIMULATION
+ TIME-STEP t=0:
+  Bank currently has 0€
+   * Person 0 (currently has 0€) earns 1000€ and takes 2000€ from the bank (now has 3000€)
+      Goal of 3000€ reached! Purchased, now has 0€
+   - Person 1 (currently has 0€) earns 1000€ and deposits 1000€ in the bank (now has 0€)
+   - Person 2 (currently has 0€) earns 1000€ and deposits 1000€ in the bank (now has 0€)
+  Bank is left with 0€
+ TIME-STEP t=1:
+  Bank currently has 0€
+   * Person 0 (currently has 0€) earns 1000€ and deposits 1000€ in the bank (now has 0€)
+   * Person 1 (currently has 0€) earns 1000€ and takes 2000€ from the bank (now has 3000€)
+      Goal of 3000€ reached! Purchased, now has 0€
+   - Person 2 (currently has 0€) earns 1000€ and deposits 1000€ in the bank (now has 0€)
+  Bank is left with 0€
+ TIME-STEP t=2:
+  Bank currently has 0€
+   * Person 0 (currently has 0€) earns 1000€ and deposits 1000€ in the bank (now has 0€)
+   * Person 1 (currently has 0€) earns 1000€ and deposits 1000€ in the bank (now has 0€)
+   * Person 2 (currently has 0€) earns 1000€ and takes 2000€ from the bank (now has 3000€)
+      Goal of 3000€ reached! Purchased, now has 0€
+  Bank is left with 0€
+Goal reach wait times: [1, 2, 3], total wait time = 6
+</code></pre></div></div>
+
 <p>What ‘ROSCA’ configurations shall we study? I settled on three different scenarios:</p>
 
 <ul>
@@ -708,7 +735,7 @@
 
 <div class="page__footer-copyright">
   &copy; 2026 Xabier Fernández, Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://github.com/academicpages/academicpages.github.io">AcademicPages</a>, a fork of <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.<br />
-  Site last updated 2026-10-22
+  Site last updated 2026-10-23
 </div>
 
       </footer>
